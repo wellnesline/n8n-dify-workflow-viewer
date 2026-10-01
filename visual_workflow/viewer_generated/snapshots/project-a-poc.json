@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "project": "project-a",
+  "slug": "project-a-poc",
+  "title": "project-a · synthetic mock PoC",
+  "captured_at": "2000-01-01T00:00:00+00:00",
+  "sources": {
+    "n8n_sha256": "4ea71324423aeb392d5d646cc0291e090db013f338d817ef2e2c6bbb83775982",
+    "dify_sha256": "15de9b0fe1995e645db3cc00554aeff78568e37f61d4d5a083d27286f3550780"
+  },
+  "graphs": [
+    {
+      "engine": "n8n",
+      "nodes": [
+        {
+          "id": "n0",
+          "label": "PoC request",
+          "type": "n8n-nodes-base.webhook",
+          "x": 0,
+          "y": 200,
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "n1",
+          "label": "Dify plan",
+          "type": "n8n-nodes-base.httpRequest",
+          "x": 280,
+          "y": 200,
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "n2",
+          "label": "Validate Dify result",
+          "type": "n8n-nodes-base.code",
+          "x": 560,
+          "y": 200,
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "n3",
+          "label": "Submit mock job",
+          "type": "n8n-nodes-base.httpRequest",
+          "x": 840,
+          "y": 200,
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "n4",
+          "label": "Wait for mock job",
+          "type": "n8n-nodes-base.wait",
+          "x": 1120,
+          "y": 200,
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "n5",
+          "label": "Observe job",
+          "type": "n8n-nodes-base.httpRequest",
+          "x": 1400,
+          "y": 200,
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "n6",
+          "label": "Return result",
+          "type": "n8n-nodes-base.respondToWebhook",
+          "x": 1680,
+          "y": 200,
+          "inputs": [],
+          "outputs": []
+        }
+      ],
+      "edges": [
+        {
+          "source": "n0",
+          "target": "n1",
+          "port": "main:0 → main:0"
+        },
+        {
+          "source": "n1",
+          "target": "n2",
+          "port": "main:0 → main:0"
+        },
+        {
+          "source": "n2",
+          "target": "n3",
+          "port": "main:0 → main:0"
+        },
+        {
+          "source": "n3",
+          "target": "n4",
+          "port": "main:0 → main:0"
+        },
+        {
+          "source": "n4",
+          "target": "n5",
+          "port": "main:0 → main:0"
+        },
+        {
+          "source": "n5",
+          "target": "n6",
+          "port": "main:0 → main:0"
+        }
+      ]
+    },
+    {
+      "engine": "dify",
+      "nodes": [
+        {
+          "id": "n0",
+          "label": "Input / 入力",
+          "type": "start",
+          "x": 0,
+          "y": 200,
+          "inputs": [
+            "title"
+          ],
+          "outputs": []
+        },
+        {
+          "id": "n1",
+          "label": "Prepare mock plan / 模擬企画",
+          "type": "code",
+          "x": 320,
+          "y": 200,
+          "inputs": [
+            "title"
+          ],
+          "outputs": [
+            "title",
+            "outline",
+            "project",
+            "mock"
+          ]
+        },
+        {
+          "id": "n2",
+          "label": "Result / 結果",
+          "type": "end",
+          "x": 640,
+          "y": 200,
+          "inputs": [],
+          "outputs": [
+            "title",
+            "outline",
+            "project",
+            "mock"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "source": "n0",
+          "target": "n1",
+          "port": "source → target"
+        },
+        {
+          "source": "n1",
+          "target": "n2",
+          "port": "source → target"
+        }
+      ]
+    }
+  ]
+}

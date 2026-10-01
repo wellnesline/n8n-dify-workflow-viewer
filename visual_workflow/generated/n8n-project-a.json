@@ -1,0 +1,234 @@
+{
+  "name": "project-a | Dify + observable mock job PoC",
+  "nodes": [
+    {
+      "id": "PoC-request",
+      "name": "PoC request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        200
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "visual-poc-project-a",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "WEBHOOK_CREDENTIAL",
+          "name": "PoC webhook"
+        }
+      }
+    },
+    {
+      "id": "Dify-plan",
+      "name": "Dify plan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        280,
+        200
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://nginx/v1/workflows/run",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({inputs:{title:$json.body.title},response_mode:'blocking',user:'poc-project-a'}) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DIFY_CREDENTIAL",
+          "name": "project-a Dify PoC"
+        }
+      }
+    },
+    {
+      "id": "Validate-Dify-result",
+      "name": "Validate Dify result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        200
+      ],
+      "parameters": {
+        "jsCode": "const d = $input.first().json.data; if (d?.status !== 'succeeded' || d.outputs?.project !== 'project-a' || typeof d.outputs?.title !== 'string' || !d.outputs.title.length) { throw new Error('Dify PoC did not produce a successful project-specific plan'); } return $input.all();"
+      }
+    },
+    {
+      "id": "Submit-mock-job",
+      "name": "Submit mock job",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        200
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://poc-adapter:8787/jobs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Idempotency-Key",
+              "value": "={{ $('PoC request').item.json.body.idempotency_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({project:'project-a',input:{title:$json.data.outputs.title,outline:$json.data.outputs.outline,mock:true} }) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ADAPTER_CREDENTIAL",
+          "name": "PoC adapter"
+        }
+      }
+    },
+    {
+      "id": "Wait-for-mock-job",
+      "name": "Wait for mock job",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        200
+      ],
+      "parameters": {
+        "amount": 1,
+        "unit": "seconds"
+      }
+    },
+    {
+      "id": "Observe-job",
+      "name": "Observe job",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1400,
+        200
+      ],
+      "parameters": {
+        "url": "={{ \"http://poc-adapter:8787/jobs/\" + $json.job_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ADAPTER_CREDENTIAL",
+          "name": "PoC adapter"
+        }
+      }
+    },
+    {
+      "id": "Return-result",
+      "name": "Return result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1680,
+        200
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "PoC request": {
+      "main": [
+        [
+          {
+            "node": "Dify plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dify plan": {
+      "main": [
+        [
+          {
+            "node": "Validate Dify result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Dify result": {
+      "main": [
+        [
+          {
+            "node": "Submit mock job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit mock job": {
+      "main": [
+        [
+          {
+            "node": "Wait for mock job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for mock job": {
+      "main": [
+        [
+          {
+            "node": "Observe job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Observe job": {
+      "main": [
+        [
+          {
+            "node": "Return result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true
+  },
+  "active": false
+}

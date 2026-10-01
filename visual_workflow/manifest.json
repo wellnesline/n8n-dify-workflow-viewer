@@ -1,0 +1,18 @@
+{
+  "_comment": "synthetic sample / example manifest. Regenerate the exports and snapshot with the steps in README.md; the verification receipt is produced only after you publish the viewer at your own HTTPS URL.",
+  "project": "project-a",
+  "scope": "new-pipeline",
+  "frameworks": ["n8n", "dify", "openspec", "langgraph"],
+  "n8n_export": "generated/n8n-project-a.json",
+  "dify_export": "generated/dify-project-a.json",
+  "job_contract": "bridge.py /jobs authenticated persistent mock API",
+  "verification": "a change-specific fixed test plus runtime E2E evidence (not included)",
+  "migrate_legacy": false,
+  "public_view": {
+    "url": "https://viewer.example.com/viewer/project-a-poc/",
+    "snapshot": "viewer_generated/snapshots/project-a-poc.json",
+    "verification": "evidence/viewer-project-a-poc.json",
+    "read_only": true,
+    "authentication": "none"
+  }
+}

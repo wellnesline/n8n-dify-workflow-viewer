@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ワークフロー確認</title><link rel="stylesheet" href="/viewer/style.css"><script src="/viewer/app.js" defer></script></head><body>
+<header><div class="eyebrow">WORKFLOW OBSERVATORY</div><h1>仕組みを、ひと目で。</h1><p>n8n と Dify に登録された工程を、ログインなしで確認できます。</p><span class="badge">閲覧専用 · 編集・実行なし</span></header>
+<main><div class="toolbar"><label for="workflow">表示するワークフロー</label><select id="workflow"></select><label for="zoom">拡大率</label><input id="zoom" type="range" min="50" max="150" value="100" step="10"><span id="zoom-value">100%</span></div>
+<p id="message" role="status">ワークフローを読み込んでいます。</p><section class="meta"><h2 id="title"></h2><p id="freshness"></p><p>実登録グラフのスナップショットです。ノードと接続は実構成に対応します。設定値・コード・条件本文・実行データは表示しません。</p></section>
+<div class="layout"><div id="graphs"></div><aside><h2>工程の詳細</h2><p class="hint">ノードを選ぶと、種類・入出力名・接続を確認できます。</p><div id="details" aria-live="polite"></div></aside></div>
+<footer>スナップショット更新は開発時の取得・検証で行います。ライブ監視や管理画面ではありません。配信元のサーバー稼働中に利用できます。</footer></main></body></html>
